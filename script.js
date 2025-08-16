@@ -43,9 +43,10 @@ const clearBtn = document.getElementById('clearBtn');
 const openaiToggle = document.getElementById('openaiToggle');
 
 // CONFIG: set this to true to use OpenAI, and put your key below.
-let USE_OPENAI = false;
-let OPENAI_API_KEY = "YOUR_API_KEY";
-let OPENAI_MODEL = "gpt-3.5-turbo";
+let USE_OPENAI = true;  
+let OPENAI_API_KEY = "sk-xxxx1234ABC...";  
+let OPENAI_MODEL = "gpt-3.5-turbo";  
+
 
 openaiToggle.addEventListener('change', (e)=>{
   USE_OPENAI = e.target.checked;
