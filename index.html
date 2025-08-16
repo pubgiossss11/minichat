@@ -2,18 +2,54 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>H4CK-CHAT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lottery Odds Lab (Giải trí/giáo dục)</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="matrix"></canvas>
-  <div class="chat-container">
-    <div id="chat-box" class="chat-box"></div>
-    <div class="chat-input">
-      <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
-      <button id="send-btn">Gửi</button>
-    </div>
-  </div>
+  <canvas id="bg"></canvas>
+
+  <main class="card">
+    <h1>🎲 Lottery Odds Lab</h1>
+    <p class="note">
+      Công cụ mang tính <b>giải trí & giáo dục</b> về xác suất. Không khuyến khích/gợi ý cá cược hoặc hứa hẹn thắng.
+    </p>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>1) Chọn bộ số (6/45)</h2>
+        <div class="picker">
+          <div id="slots" class="slots"></div>
+          <div class="row">
+            <button id="randomBtn">Chọn ngẫu nhiên</button>
+            <button id="clearBtn">Xóa</button>
+          </div>
+          <small>Chạm vào ô để nhập số từ 1–45, không trùng.</small>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>2) Quay thử (mô phỏng)</h2>
+        <div class="sim">
+          <div class="row">
+            <label>Số lần quay: <input type="number" id="nTrials" value="1000" min="1" max="200000"></label>
+          </div>
+          <button id="runSimBtn">Chạy mô phỏng</button>
+          <div id="simResult" class="result"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>3) Xác suất & kỳ vọng</h2>
+        <div id="oddsBox" class="odds"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© Lottery Odds Lab – for learning only.</span>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>

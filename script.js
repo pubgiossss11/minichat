@@ -1,143 +1,122 @@
-// ========== Matrix "code rain" background ==========
-(function matrix(){
-  const canvas = document.getElementById('codeRain');
-  const ctx = canvas.getContext('2d');
-  let w, h, cols, drops;
-  const glyphs = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポ0123456789';
-  const fontSize = 16;
-
-  function resize(){
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    cols = Math.floor(w / fontSize);
-    drops = Array(cols).fill(0);
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  function draw(){
-    // fade trail
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = '#13ff87';
-    ctx.font = fontSize + 'px monospace';
-
-    for(let i=0;i<drops.length;i++){
-      const text = glyphs[Math.floor(Math.random()*glyphs.length)];
-      const x = i*fontSize;
-      const y = drops[i]*fontSize;
-      ctx.fillText(text, x, y);
-      if(y > h && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
+// ===== Matrix-like background =====
+(function bg(){
+  const c = document.getElementById('bg'); const ctx = c.getContext('2d');
+  let w,h,cols,drops; const font=16;
+  const glyphs = '01▓▒░█アカサタナハマヤラワガザダバパ0123456789'.split('');
+  function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; cols=Math.floor(w/font); drops=Array(cols).fill(0); }
+  addEventListener('resize', resize); resize();
+  (function draw(){
+    ctx.fillStyle='rgba(0,0,0,.08)'; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#13ff87'; ctx.font=font+'px monospace';
+    for(let i=0;i<drops.length;i++){ const t=glyphs[Math.random()*glyphs.length|0]; ctx.fillText(t, i*font, drops[i]*font);
+      if(drops[i]*font>h && Math.random()>.975) drops[i]=0; drops[i]++; }
     requestAnimationFrame(draw);
-  }
-  draw();
+  })();
 })();
 
-// ========== Chat logic ==========
-const messagesEl = document.getElementById('messages');
-const inputEl = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
+// ===== Lottery logic (6/45) – education only =====
+const N=45, K=6; // 6 numbers picked from 1..45
+const slotsEl = document.getElementById('slots');
+const randomBtn = document.getElementById('randomBtn');
 const clearBtn = document.getElementById('clearBtn');
-const openaiToggle = document.getElementById('openaiToggle');
+const runSimBtn = document.getElementById('runSimBtn');
+const nTrialsEl = document.getElementById('nTrials');
+const simResultEl = document.getElementById('simResult');
+const oddsBox = document.getElementById('oddsBox');
 
-// CONFIG: set this to true to use OpenAI, and put your key below.
-let USE_OPENAI = false;
-let OPENAI_API_KEY = "YOUR_API_KEY";
-let OPENAI_MODEL = "gpt-3.5-turbo";
-
-openaiToggle.addEventListener('change', (e)=>{
-  USE_OPENAI = e.target.checked;
-  statusMsg('OpenAI: ' + (USE_OPENAI ? 'ON' : 'OFF'));
-});
-
-function statusMsg(t){
-  const div = document.createElement('div');
-  div.className = 'msg bot';
-  div.textContent = '▸ ' + t;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-function addMessage(text, isMe){
-  const div = document.createElement('div');
-  div.className = 'msg ' + (isMe ? 'me' : 'bot');
-  div.textContent = text;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-async function botReply(text){
-  // Offline mock
-  if(!USE_OPENAI || OPENAI_API_KEY === "YOUR_API_KEY"){
-    await sleep(400);
-    const lower = text.toLowerCase();
-    if(lower.includes('xin chào') || lower.includes('hello')){
-      return "Xin chào, mình là H4CK-CHAT. Mình có thể trả lời câu hỏi cơ bản!";
-    }
-    if(lower.includes('giúp')){
-      return "Bạn có thể bật OpenAI ở góc dưới (điền API key hoặc tài khoản mật khẩu để tool báo chuẩn nhất ).";
-    }
-    if(lower.includes('time') || lower.includes('giờ')){
-      return "Bây giờ là: " + new Date().toLocaleString();
-    }
-    return "Echo: " + text;
-  }
-
-  // OpenAI path
-  try{
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + OPENAI_API_KEY
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        messages: [
-          {role:"system", content:"Bạn là trợ lý thân thiện, trả lời ngắn gọn bằng tiếng Việt."},
-          {role:"user", content:text}
-        ],
-        temperature: 0.4
-      })
+// init slots
+let current = Array(K).fill(null);
+function renderSlots(){
+  slotsEl.innerHTML='';
+  current.forEach((v,idx)=>{
+    const s=document.createElement('div'); s.className='slot'+(v==null?' empty':'');
+    s.textContent = v==null ? '-' : v;
+    s.addEventListener('click', ()=>{
+      const val = prompt('Nhập số 1–'+N, v??'');
+      if(val===null) return;
+      const num = Number(val);
+      if(!Number.isInteger(num) || num<1 || num>N) return alert('Số không hợp lệ.');
+      if(current.includes(num) && current[idx]!==num) return alert('Không được trùng số.');
+      current[idx]=num; renderSlots();
     });
-    const data = await resp.json();
-    const msg = data?.choices?.[0]?.message?.content?.trim();
-    return msg || "Không nhận được phản hồi từ mô hình.";
-  }catch(e){
-    return "Lỗi gọi OpenAI: " + e.message;
+    slotsEl.appendChild(s);
+  });
+}
+renderSlots();
+
+function randomPick(){
+  const pool = Array.from({length:N}, (_,i)=>i+1);
+  const pick = [];
+  for(let i=0;i<K;i++){
+    const j = Math.floor(Math.random()*pool.length);
+    pick.push(pool.splice(j,1)[0]);
   }
+  pick.sort((a,b)=>a-b);
+  current = pick;
+  renderSlots();
+}
+randomBtn.addEventListener('click', randomPick);
+clearBtn.addEventListener('click', ()=>{ current=Array(K).fill(null); renderSlots(); });
+
+function combinations(n,k){
+  if(k<0||k>n) return 0;
+  if(k===0||k===n) return 1;
+  k=Math.min(k,n-k);
+  let num=1, den=1;
+  for(let i=1;i<=k;i++){ num*= (n - k + i); den*= i; }
+  return Math.round(num/den);
 }
 
-function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+function computeOdds(){
+  const total = combinations(N,K);
+  // probability of matching m numbers exactly (orderless, without bonus ball)
+  let txt = `Tổng số tổ hợp 6/${N}: C(${N},${K}) = ${total.toLocaleString()}
 
-async function send(){
-  const text = inputEl.value.trim();
-  if(!text) return;
-  addMessage(text, true);
-  inputEl.value = '';
-
-  const placeholder = document.createElement('div');
-  placeholder.className = 'msg bot';
-  placeholder.textContent = "đang gõ...";
-  messagesEl.appendChild(placeholder);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-
-  const reply = await botReply(text);
-  placeholder.remove();
-  addMessage(reply, false);
+`;
+  txt += `Xác suất trùng đúng m số (m = 0..6):
+`;
+  for(let m=0;m<=K;m++){
+    const ways = combinations(K,m)*combinations(N-K, K-m);
+    const p = ways/total;
+    txt += `- m = ${m}: ${(p*100).toExponential(2)}%  (≈ 1 / ${(1/p).toFixed(0).toLocaleString()})
+`;
+  }
+  txt += `
+Kỳ vọng thắng (nếu thưởng > 0) phụ thuộc thể lệ từng loại hình. Công cụ này không gợi ý đặt cược.`;
+  oddsBox.textContent = txt;
 }
+computeOdds();
 
-sendBtn.addEventListener('click', send);
-inputEl.addEventListener('keydown', e=>{
-  if(e.key === 'Enter') send();
+function drawOnce(){
+  // draw 6 unique numbers
+  const pool = Array.from({length:N}, (_,i)=>i+1);
+  const draw=[];
+  for(let i=0;i<K;i++){ draw.push(pool.splice(Math.random()*pool.length|0,1)[0]); }
+  draw.sort((a,b)=>a-b);
+  return draw;
+}
+function countMatches(a,b){ let set=new Set(a); return b.filter(x=>set.has(x)).length; }
+
+runSimBtn.addEventListener('click', ()=>{
+  // validate chosen numbers
+  if(current.some(v=>v==null)){ return alert('Hãy điền đủ 6 số hoặc bấm "Chọn ngẫu nhiên".'); }
+  const chosen = [...current].sort((a,b)=>a-b);
+  const trials = Math.max(1, Math.min(200000, parseInt(nTrialsEl.value)||1000));
+  const bucket = [0,0,0,0,0,0,0]; // matches 0..6
+  for(let t=0;t<trials;t++){
+    const draw = drawOnce();
+    const m = countMatches(chosen, draw);
+    bucket[m]++;
+  }
+  let out = `Đã mô phỏng ${trials.toLocaleString()} lần.
+Bộ số của bạn: ${chosen.join('-')}.
+
+Phân bố số lần trùng (m = 0..6):
+`;
+  for(let m=0;m<=6;m++){
+    const c=bucket[m]; const pct=(c/trials*100).toFixed(3);
+    out += `- m = ${m}: ${c.toLocaleString()} lần (${pct}%)
+`;
+  }
+  simResultEl.textContent = out;
 });
-clearBtn.addEventListener('click', ()=>{
-  messagesEl.innerHTML = '';
-  statusMsg('đã xóa lịch sử.');
-});
-
-// greet
-statusMsg('sẵn sàng. Gõ thử: "xin chào", "giúp", "giờ".');
-
