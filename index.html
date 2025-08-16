@@ -2,29 +2,59 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Robot Jackpot</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Tool Quay Hũ</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+    .header {
+      font-size: 40px;
+      font-weight: bold;
+      color: red;
+      padding: 20px;
+      text-shadow: 0 0 15px red;
+    }
+    .panel {
+      border: 2px solid red;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px red;
+    }
+    .robot {
+      width: 200px;
+      margin: 20px auto;
+      display: block;
+      filter: drop-shadow(0 0 15px red);
+    }
+    .highlight {
+      color: cyan;
+      font-size: 24px;
+      margin: 10px 0;
+      text-shadow: 0 0 10px cyan;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 18px;
+      color: yellow;
+      text-shadow: 0 0 10px yellow;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">KHUNG GIỜ JACKPOT</h1>
-
-    <!-- Robot -->
-    <div class="robot">
-      <img src="assets/robot.png" alt="Robot">
-    </div>
-
-    <!-- Đồng hồ đếm ngược -->
-    <div class="timer">
-      <span id="countdown">00:00</span>
-    </div>
-
-    <!-- Số vòng quay -->
-    <div class="jackpot-box">
-      <p>Số vòng quay: <span id="spins">0</span></p>
-    </div>
+  <div class="header">TOOL QUAY HŨ</div>
+  
+  <div class="panel">
+    <img src="robot.png" alt="Robot AI" class="robot">
+    <div class="highlight">CÂN MỌI SÀNH GAME</div>
+    <div class="highlight">KHUNG GIỜ CHUẨN</div>
   </div>
 
-  <script src="script.js"></script>
+  <div class="footer">CÀI TRỰC TIẾP TRÊN MÁY - MIỄN PHÍ</div>
 </body>
 </html>
