@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: #000 url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
+  color: #0f0;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+}
+
+.title {
+  font-size: 28px;
+  text-shadow: 0 0 10px #0f0;
+  margin-bottom: 20px;
+}
+
+.robot img {
+  width: 250px;
+  filter: drop-shadow(0 0 20px #0ff);
+}
+
+.timer {
+  font-size: 36px;
+  margin: 20px 0;
+  text-shadow: 0 0 15px #0f0;
+}
+
+.jackpot-box {
+  border: 2px solid #0f0;
+  padding: 15px;
+  width: 250px;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: 0 0 15px #0f0;
+}
