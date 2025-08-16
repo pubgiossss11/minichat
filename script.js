@@ -43,9 +43,77 @@ const clearBtn = document.getElementById('clearBtn');
 const openaiToggle = document.getElementById('openaiToggle');
 
 // CONFIG: set this to true to use OpenAI, and put your key below.
-let USE_OPENAI = false;
-let OPENAI_API_KEY = "YOUR_API_KEY";
-let OPENAI_MODEL = "gpt-3.5-turbo";
+let USE_OPENAI = true;  
+let OPENAI_API_KEY = "sk-xxxx123";  
+let OPENAI_MODEL = "gpt-3.5-turbo";  
+
+const chatBox = document.getElementById("chat-box");
+const inputField = document.getElementById("chat-input");
+const sendBtn = document.getElementById("send-btn");
+
+// --- Lưu & tải lịch sử ---
+function saveChatHistory() {
+    localStorage.setItem("chatHistory", chatBox.innerHTML);
+}
+
+function loadChatHistory() {
+    const history = localStorage.getItem("chatHistory");
+    if (history) {
+        chatBox.innerHTML = history;
+    }
+}
+
+// --- Hàm thêm tin nhắn ---
+function addMessage(sender, text) {
+    let msg = document.createElement("div");
+    msg.className = sender === "user" ? "msg user" : "msg bot";
+    msg.innerText = text;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    saveChatHistory(); // 👉 lưu lại mỗi lần có tin nhắn
+}
+
+// --- Gửi tin nhắn ---
+sendBtn.addEventListener("click", async () => {
+    let text = inputField.value.trim();
+    if (!text) return;
+    addMessage("user", text);
+    inputField.value = "";
+
+    // Gọi OpenAI nếu bật
+    if (USE_OPENAI) {
+        let reply = await askOpenAI(text);
+        addMessage("bot", reply);
+    } else {
+        // Chat giả lập
+        addMessage("bot", "Bot trả lời: " + text);
+    }
+});
+
+// --- Hàm gọi API OpenAI ---
+async function askOpenAI(prompt) {
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: OPENAI_MODEL,
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+    } catch (err) {
+        return "Lỗi khi gọi API!";
+    }
+}
+
+// --- Khi load lại trang, hiển thị lịch sử ---
+loadChatHistory();
 
 openaiToggle.addEventListener('change', (e)=>{
   USE_OPENAI = e.target.checked;
