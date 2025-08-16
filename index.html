@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ChatBot (Mock)</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: sans-serif; margin:0; }
+    #chatBubble {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, #4CAF50, #8BC34A);
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer; color: white; font-size: 28px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    #chatWindow {
+      position: fixed; bottom: 90px; right: 20px;
+      width: 300px; height: 400px; background: white;
+      border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: none; flex-direction: column;
+      z-index: 999;
+    }
+    #chatHeader {
+      background: #4CAF50; color: white; padding: 10px;
+      border-radius: 12px 12px 0 0; font-weight: bold;
+    }
+    #messages {
+      flex: 1; overflow-y: auto; padding: 10px;
+    }
+    .msg {
+      margin: 6px 0; padding: 8px 12px; border-radius: 14px;
+      max-width: 75%; clear: both;
+    }
+    .me { background: #4CAF50; color: white; float: right; }
+    .bot { background: #f1f1f1; float: left; }
+    #chatInput { display: flex; border-top: 1px solid #ddd; }
+    #chatInput input { flex: 1; border: none; padding: 10px; }
+    #chatInput button { border: none; background: #4CAF50; color: white; padding: 0 16px; }
+  </style>
+</head>
+<body>
+
+<div id="chatBubble">🤖</div>
+
+<div id="chatWindow">
+  <div id="chatHeader">Chat Bot</div>
+  <div id="messages"></div>
+  <div id="chatInput">
+    <input id="userInput" placeholder="Nhập tin nhắn..." />
+    <button onclick="sendMessage()">Gửi</button>
+  </div>
+</div>
+
+<script>
+const bubble = document.getElementById('chatBubble');
+const windowEl = document.getElementById('chatWindow');
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('userInput');
+
+bubble.onclick = () => {
+  windowEl.style.display = windowEl.style.display === 'flex' ? 'none' : 'flex';
+};
+
+function addMessage(text, isMe) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + (isMe ? 'me' : 'bot');
+  div.innerText = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  addMessage(text, true);
+  inputEl.value = '';
+
+  // 🔹 Trả lời giả lập (offline)
+  setTimeout(() => {
+    let reply = "Mình chưa hiểu ý bạn, nhưng mình là bot mock 😊";
+    if (text.toLowerCase().includes("chào")) reply = "Xin chào 👋, rất vui được gặp bạn!";
+    if (text.toLowerCase().includes("tên")) reply = "Mình là ChatBot mini bản demo.";
+    if (text.toLowerCase().includes("giúp")) reply = "Mình có thể giả lập trả lời cho bạn trong app này.";
+    addMessage(reply, false);
+  }, 600);
+}
+</script>
+
+</body>
+</html>
