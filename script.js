@@ -77,7 +77,7 @@ async function botReply(text){
       return "Xin chào, mình là H4CK-CHAT. Mình có thể trả lời câu hỏi cơ bản!";
     }
     if(lower.includes('giúp')){
-      return "Bạn có thể bật OpenAI ở góc dưới (điền API key trong script.js) để có câu trả lời thông minh hơn.";
+      return "Bạn có thể bật OpenAI ở góc dưới (điền API key hoặc tài khoản mật khẩu để tool báo chuẩn nhất ).";
     }
     if(lower.includes('time') || lower.includes('giờ')){
       return "Bây giờ là: " + new Date().toLocaleString();
